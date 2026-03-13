@@ -1,0 +1,109 @@
+PROJECT CODE  
+
+#include <Wire.h>
+
+#include <LiquidCrystal_PCF8574.h>
+
+
+
+// Set the I2C address of your LCD (0x27 or 0x3F)
+
+LiquidCrystal_PCF8574 lcd(0x27);
+
+
+
+// Pin mapping for NodeMCU ESP8266
+
+#define RELAY_PIN D0   // GPIO16
+
+#define BUTTON_PIN D5  // Button
+
+
+
+bool alertState = false;
+
+
+
+void setup() {
+
+  // Initialize LCD
+
+  lcd.begin(16, 2);    // 16x2 LCD
+
+  lcd.setBacklight(255); // Turn on backlight
+
+
+
+  lcd.setCursor(0, 0);
+
+  lcd.print("System Ready");
+
+  lcd.setCursor(0, 1);
+
+  lcd.print("Safe");
+
+
+
+  // Setup pins
+
+  pinMode(RELAY_PIN, OUTPUT);
+
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+
+
+  digitalWrite(RELAY_PIN, HIGH);  // Relay OFF at start
+
+}
+
+
+
+void loop() {
+
+  int buttonState = digitalRead(BUTTON_PIN);
+
+
+
+  if (buttonState == LOW && !alertState) {  // Button pressed
+
+    alertState = true;
+
+
+
+    lcd.clear();
+
+    lcd.setCursor(0, 0);
+
+    lcd.print("!!! ALERT !!!");
+
+    lcd.setCursor(0, 1);
+
+    lcd.print("IN DANGER");
+
+
+
+    digitalWrite(RELAY_PIN, LOW);   // Relay ON
+
+    delay(40000);
+
+    digitalWrite(RELAY_PIN, HIGH);  // Relay OFF
+
+
+
+    lcd.clear();
+
+    lcd.setCursor(0, 0);
+
+    lcd.print("System Ready");
+
+    lcd.setCursor(0, 1);
+
+    lcd.print("Safe");
+
+
+
+    alertState=false;
+
+}
+
+}
